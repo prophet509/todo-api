@@ -4,11 +4,16 @@ const request = require('supertest');
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 
+const todos= [{
+    text:"First test todo"
+},{
+    text:"Second test todo"
+}]
 
 beforeEach((done) => {
     Todo.remove({}).then(() => {
-        done();
-    });
+        return Todo.insertMany(todos);
+    }).then(() =>done());
 });
 describe('POST /todos', () => {
     it('shold  create a new todo', (done) => {
@@ -26,7 +31,7 @@ describe('POST /todos', () => {
                 if (err) {
                     return done(err);
                 }
-                Todo.find().then((todos) => {
+                Todo.find({text}).then((todos) => {
                     expect(todos.length).toBe(1);
                     expect(todos[0].text).text;
                     done();
@@ -44,10 +49,22 @@ describe('POST /todos', () => {
                 if(err ){
                     done(err);
                 }
-                Todo.find().then((todos) => {
-                    expect(todos.length).toBe(0);
+                Todo.find().then((todows) => {
+                    expect(todows.length).toBe(2);
                     done();
                 }).catch((e) => done(err));
             });
     });
+ 
 });
+describe('GET /todos',() => {
+    it('shoul get all todos',(done) => {
+        request(app)
+            .get('/todos')
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.length).toBe(2);
+            })
+            .end(done);
+    });
+})
