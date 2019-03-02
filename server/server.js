@@ -20,6 +20,13 @@ app.post('/todos',(req,res) => {
         res.status(400).send(e);
       });
 });
+app.get('/todos', (req,res) => {
+    Todo.find().then((docs) => {
+        res.send(docs);
+    },(e) => {
+        res.status(400).send(e);
+    });
+});
 app.get('/',(req,res) => {
     console.log("Da chay");
     res.send("aasdfasdf");
