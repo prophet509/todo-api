@@ -16,10 +16,9 @@ app.post('/todos',(req,res) => {
     });
     todo.save().then((doc) => {
         res.send(doc);
-        next();
-    },(err) => {
+      }, (e) => {
         res.status(400).send(e);
-    });
+      });
 });
 app.get('/',(req,res) => {
     console.log("Da chay");
@@ -28,3 +27,6 @@ app.get('/',(req,res) => {
 app.listen(3000,() => {
     console.log("Server is begin at",3000);
 });
+module.exports = {
+    app
+};
