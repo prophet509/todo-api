@@ -1,12 +1,15 @@
 const expect = require('expect');
 const request = require('supertest');
 
+const {ObjectID} = require('mongodb');
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 
 const todos= [{
+    _id:new ObjectID(),
     text:"First test todo"
 },{
+    _id:new ObjectID(),
     text:"Second test todo"
 }]
 
@@ -15,6 +18,8 @@ beforeEach((done) => {
         return Todo.insertMany(todos);
     }).then(() =>done());
 });
+
+
 describe('POST /todos', () => {
     it('shold  create a new todo', (done) => {
         var text = 'Text todo text';
@@ -57,6 +62,8 @@ describe('POST /todos', () => {
     });
  
 });
+
+
 describe('GET /todos',() => {
     it('shoul get all todos',(done) => {
         request(app)
@@ -65,6 +72,33 @@ describe('GET /todos',() => {
             .expect((res) => {
                 expect(res.body.length).toBe(2);
             })
+            .end(done);
+    });
+});
+
+
+describe('GET /todos/:id',() => {
+    it('should get todos follow id',(done) => {
+        request(app)
+            .get(`/todos/${todos[0]._id.toHexString()}`)
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.text).toBe(todos[0].text);
+            })
+            .end(done);
+    });
+    it('should return 404 if todo not found',(done) => {
+        var hexID = new ObjectID().toHexString();
+        request(app)
+            .get(`/todos/${hexID}`)
+            .expect(404)
+            .end(done);
+    });
+    it('should return 404 if todo not found',(done) => {
+        var hexID = new ObjectID().toHexString();
+        request(app)
+            .get(`/todos/asdfasdf`)
+            .expect(404)
             .end(done);
     });
 })
